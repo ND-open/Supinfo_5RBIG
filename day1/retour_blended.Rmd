@@ -1,0 +1,83 @@
+---
+title: "Retour sur le Blended cours"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Importer les données
+
+```{r}
+sn <- read.csv("social_network.csv", header = T)
+```
+
+
+## Exploration
+
+Avec un histogramme
+
+```{r}
+hist(sn$Age)
+
+hist(sn$Age,
+     col = "beige",
+     main = "Ages of Respondents\nSocial Networking Survey of 202 Users",
+     xlab = "Age of Respondents")
+```
+
+Ou un barplot
+
+```{r}
+boxplot(sn$Age,
+        col = "beige",
+        notch = T,
+        horizontal = T,
+        main = "Ages of Respondents\nSocial Networking Survey of 202 Users",
+        xlab = "Age of Respondents")
+```
+
+Avec des statistiques :
+
+Par observation les occurences (frequency) et les fréquences (proportion) :
+
+```{r}
+table(sn$Site)
+site.freq <- table(sn$Site)
+site.freq
+
+site.freq <- site.freq[order(site.freq, decreasing = T)] table
+site.freq
+
+prop.table(site.freq)
+round(prop.table(site.freq), 2)
+```
+
+
+```{r}
+summary(sn)
+```
+
+A comparer avec le boxplot, le five number de Tukey
+
+```{r}
+fivenum(sn$Age)
+```
+
+
+Installation et utilisation de `psych` :
+
+```{r}
+install.packages("psych")
+library("psych")
+describe(sn)
+```
+
+
+## Travaux Pratique
+
+Effectuez l'étude du fichier `google_correlate.csv`.
+
+google <- read.csv("google_correlate.csv", header = T)

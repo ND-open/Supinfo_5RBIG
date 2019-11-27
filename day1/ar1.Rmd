@@ -1,0 +1,46 @@
+---
+title: "Activité Rapide 1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### 1) Variable quantitative
+
+Soit un échantillon $X = \{1, 1, 2, 2, 2, 2, 3, 3\}$
+
+Calculez les statistiques suivantes :
+
+  * la moyenne
+  * la médiane
+  * la variance
+  * l'écart type
+  * le mode
+  
+  
+#### 2) Diagramme
+
+Représentez l'échantillon précédent sous forme d'histogramme.
+
+```{r, echo = FALSE}
+s_num <- c(1, 1, 2, 2, 2, 2, 3, 3)
+
+# base
+# ggplot2
+# library(ggplot2)
+```
+
+
+#### 3) Variable qualitative
+
+Soit un autre échantillon $F = \{"apple", "apricot", "apricot", "avocado", "avocado", "avocado"\}$. Donnez le mode de $F$ et dessinez son diagramme en bâton (barplot).
+
+```{r, echo = FALSE}
+# idea from stringr::fruit
+s_fruit <- c("apple", "apricot", "apricot", "avocado", "avocado", "avocado")
+```
+
+
+
