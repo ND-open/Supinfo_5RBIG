@@ -108,11 +108,19 @@ df_clean %>%
 library(forcats)
 
 df_clean %>% 
+        transmute(CookType1 = forcats::fct_lump(f = CookType1, prop = .01))
+
+df_cook <- df_clean %>% 
         group_by(CookType1) %>% # CookType2
         summarise(nb = n(), m_rating = mean(Rating, na.rm = TRUE)) %>% 
         arrange(- nb) %>% 
-        slice(1:20) %>% 
+        slice(1:20)
+
+df_cook %>% 
         ggplot(aes(x = forcats::fct_reorder(CookType1, nb), y = nb)) + geom_col() + coord_flip()
+
+df_cook %>% 
+        ggplot(aes(x = forcats::fct_reorder(CookType1, m_rating), y = m_rating)) + geom_col() + coord_flip()
 
 
 # df_p <- df_clean %>% 
@@ -126,7 +134,40 @@ df_clean %>%
 
 
 ```{r}
+
+```
+
+
+```{r}
 # boxplot notes / type de cuisine (+ par villes ?)
+
+# boxplot notes / type de resto (+ par villes ?)
+df_clean %>% 
+        ggplot(aes(x = Category, y =Rating)) +
+        geom_boxplot() +
+        coord_flip()
+
+df_cat <- df_clean %>% 
+        filter(Category %in% c("Street", "Steakhouse"))
+t.test(Rating ~ Category, data = df_cat)
+```
+
+
+```{r}
+lm_mod <- lm(Rating ~ 0 + Category, data = df_clean)
+lm_mod
+summary(lm_mod)
+
+anova(lm_mod)
+```
+
+
+```{r}
+glimpse(df_clean)
+df_mod <- df_clean[, -c(1:2, 10:11, 14, 16:17)]
+glimpse(df_mod)
+lm_mod2 <- lm(Rating ~ 0 + City + CookType1 + Category + PriceRange + NumberOfReviews, data = df_clean)
+summary(lm_mod2)
 ```
 
 
