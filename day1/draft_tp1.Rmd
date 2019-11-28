@@ -1,7 +1,7 @@
 ---
-title: "TP1 "
+title: "draft tp1"
 output: 
-  html_notebook:
+  html_document:
           toc: yes
 ---
 
@@ -49,7 +49,8 @@ dfr
 # knitr::kable(res)
 # saveRDS(res, "load_data_benchmark.rds")
 res <- readRDS("load_data_benchmark.rds")
-res
+knitr::kable(res)
+summary(res)
 ```
 
 
@@ -79,9 +80,28 @@ Summary & Barplot
 summary(df_clean)
 ```
 
-```{r}
+Pour une var
 
+```{r}
+df_clean %>% 
+        # ggplot(aes(x = City)) + geom_bar() +coord_flip()
+        count(City) %>%
+        ggplot(aes(x = forcats::fct_reorder(City, .x = n), y = n)) +
+        geom_bar(stat = "identity") +
+        coord_flip()
 ```
+
+Croisée quali / quali
+
+```{r}
+df_clean %>% 
+        group_by(City, PriceRange) %>% 
+        summarise(nb = n()) %>% 
+        ggplot(aes(PriceRange, City, fill = nb)) +
+        geom_tile() +
+        scale_fill_gradient2()
+```
+
 
 
 * 2) Study the different quantitative variables:  descriptives statistics, charts.
