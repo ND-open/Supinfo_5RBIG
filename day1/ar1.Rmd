@@ -30,6 +30,15 @@ s_num <- c(1, 1, 2, 2, 2, 2, 3, 3)
 # base
 # ggplot2
 # library(ggplot2)
+
+summary(s_num)
+hist(s_num)
+library(dplyr)
+library(ggplot2)
+
+s_num %>%
+  as_tibble() %>% 
+  ggplot(aes(x = value)) + geom_histogram()
 ```
 
 
@@ -40,6 +49,9 @@ Soit un autre échantillon $F = \{"apple", "apricot", "apricot", "avocado", "avo
 ```{r, echo = FALSE}
 # idea from stringr::fruit
 s_fruit <- c("apple", "apricot", "apricot", "avocado", "avocado", "avocado")
+s_fruit %>% 
+  as_tibble() %>% 
+  ggplot(aes(value)) + geom_bar()
 ```
 
 

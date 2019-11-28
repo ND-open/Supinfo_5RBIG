@@ -20,6 +20,7 @@ sn <- read.csv("social_network.csv", header = T)
 Avec un histogramme
 
 ```{r}
+str(sn)
 hist(sn$Age)
 
 hist(sn$Age,
@@ -31,6 +32,7 @@ hist(sn$Age,
 Ou un barplot
 
 ```{r}
+summary(sn$Age)
 boxplot(sn$Age,
         col = "beige",
         notch = T,
@@ -48,7 +50,7 @@ table(sn$Site)
 site.freq <- table(sn$Site)
 site.freq
 
-site.freq <- site.freq[order(site.freq, decreasing = T)] table
+site.freq <- site.freq[order(site.freq, decreasing = T)]
 site.freq
 
 prop.table(site.freq)
@@ -70,7 +72,7 @@ fivenum(sn$Age)
 Installation et utilisation de `psych` :
 
 ```{r}
-install.packages("psych")
+# install.packages("psych")
 library("psych")
 describe(sn)
 ```
@@ -80,4 +82,149 @@ describe(sn)
 
 Effectuez l'étude du fichier `google_correlate.csv`.
 
+```{r}
 google <- read.csv("google_correlate.csv", header = T)
+google
+```
+
+
+## Catégorie selon variable numérique
+
+```{r}
+list_region <-split(google$data_viz, google$region) 
+boxplot(list_region)
+
+library(dplyr)
+library(ggplot2)
+google %>% 
+        ggplot(aes(x = region, y = data_viz, fill = region)) +
+        geom_boxplot(notch = TRUE)
+        # geom_violin()
+        
+google %>% 
+        ggplot(aes(x = data_viz, fill = region)) +
+        # geom_histogram(alpha = .7)
+        geom_density(alpha = .7)
+        
+```
+
+
+## Numérique vs numérique
+
+```{r}
+# plot(google)
+plot(google$facebook, google$data_viz)
+
+google %>% 
+        ggplot(aes(x= facebook, y = data_viz)) +
+        geom_point() +
+        geom_smooth(method = "lm") # loess
+```
+
+
+
+```{r}
+lm_mod <- lm(facebook ~ data_viz, data = google)
+lm_mod
+```
+
+```{r}
+cor(google$facebook, google$data_viz)
+```
+
+## test pour modalités
+
+```{r}
+google %>% 
+        ggplot(aes(x= stats_ed, y = data_viz, fill = stats_ed)) +
+        geom_boxplot()
+# google$stats_ed
+
+```
+
+
+```{r}
+groups <- split(google$data_viz, google$stats_ed)
+
+t.test(x= groups$no, y = groups$yes)
+
+t.test(x = data_viz ~ stats_ed, data = google)
+
+anova(object = data_viz ~ stats_ed, data = google)
+```
+
+
+Take home message :
+
+* Pour comparer la significativité de deux groupes (O/n) on utise un t.test
+* Pour comparer la significativité de plusiueurs (O/n) on utise un anova
+
+
+
+```{r}
+
+# plot(google)
+
+# Does interest in data visualization vary by region?
+# Split data by region, create new data frame
+viz.reg.dist <- split(google$data_viz, google$region)
+
+# Draw boxplots by region
+boxplot(viz.reg.dist, col = "lavender")
+
+# To draw barplot with means
+viz.reg.mean <- sapply(viz.reg.dist, mean)
+# Run next two together (or sequentially)
+barplot(viz.reg.mean,
+        col = "beige",
+        main = "Average Google Search Share of\n\"Data Visualization\" by Region of US")
+abline(h = 0)
+
+# Install and load "psych" package to print means, etc.
+# install.packages("psych")
+# library("psych")
+# describeBy(google$data_viz, google$region)
+```
+
+
+```{r}
+# Is there an association between the percentage of people
+# in a state with college degrees and interest in
+# data visualization?
+plot(google$degree, google$data_viz)
+# Add title, labels, change circles to points
+plot(google$degree, google$data_viz,
+     main = "Interest in Data Visualization Searches\nby Percent of Population with College Degrees",
+     xlab = "Population with College Degrees",
+     ylab = "Searches for \"Data Visualization\"",
+     pch = 20,
+     col = "grey")
+# Add fit lines
+# Linear regression line (y ~ x) 
+abline(lm(google$data_viz ~ google$degree), col="red")
+# Lowess smoother line (x, y)
+lines(lowess(google$degree, google$data_viz), col="blue")
+```
+
+
+```{r}
+# Basic Scatterplot Matrix
+pairs(~data_viz + degree + facebook + nba,
+      data = google, 
+      pch = 20,
+      main = "Simple Scatterplot Matrix")
+```
+
+
+```{r}
+# library("rgl")
+plot3d (google$data_viz,  # x variable
+       google$degree,    # y variable
+       google$facebook,  # z variable
+       xlab = "data_viz",
+       ylab = "degree",
+       zlab = "facebook",
+       col  = "red", 
+       size = 3)
+```
+
