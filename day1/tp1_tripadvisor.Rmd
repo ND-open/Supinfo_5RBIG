@@ -1,45 +1,51 @@
 ---
-title: "draft tp1"
+title: "TP1 - étude des données Trip Advisor et modélisation des notes"
 output: 
   html_document:
           toc: yes
 ---
 
-```{r}
+```{r load pkg}
+# install packages if not here
+pkgs <- c("dplyr", "ggplot2", "forcats")
+for(pkg in pkgs){
+  if(! suppressPackageStartupMessages( require(pkg, character.only = TRUE) ) ){
+    install.packages(pkg, character.only = TRUE)
+  }
+}
+
 # Chargement des lib
 suppressPackageStartupMessages( library(dplyr) )
-```
-
-
-```{r}
 suppressPackageStartupMessages( library(ggplot2) )
+library(forcats)
 ```
+
+Plan proposé : 
+
+* 1) Study the different categorical variables: frequencies, proportions, charts.
+
+* 2) Study the different quantitative variables:  descriptives statistics, charts.
+
+* 3) Study associations between categorical variables.
+
+* 4) Study associations between quantitative variables and categorical variables.
+
+* 5) Perform t-tests to compare pairwise the rating or the number of reviews of some cities.
+
+* 6) Perform an ANOVA to compare the rating or the number of reviews depending on the city. 
 
 
 ## TRIPADVISOR usecase
 
-Analyse des variables (types)
+Analyse des variables (types).
 
-```{r}
+```{r ways to load data}
 # getwd()
 # dfr <- utils::read.csv("Tripadvisor.csv")
-```
-
-
-```{r}
 # dfr2 <- readr::read_csv("Tripadvisor.csv")
 # dfr3 <- data.table::fread("Tripadvisor.csv", header = TRUE)
-# str(dfr3)
 ```
-
-
-```{r}
-dfr <- vroom::vroom("Tripadvisor.csv", delim = ",", col_names = TRUE) # , skip = 1
-dfr
-```
-
-
-```{r}
+```{r benchmark}
 # res <- microbenchmark::microbenchmark(utils::read.csv("Tripadvisor.csv"),
 #                                readr::read_csv("Tripadvisor.csv"),
 #                                data.table::fread("Tripadvisor.csv", header = TRUE),
@@ -48,43 +54,46 @@ dfr
 
 # knitr::kable(res)
 # saveRDS(res, "load_data_benchmark.rds")
-res <- readRDS("load_data_benchmark.rds")
-knitr::kable(res)
-summary(res)
+# res <- readRDS("load_data_benchmark.rds")
+# knitr::kable(res)
+# summary(res)
 ```
 
 
-```{r}
+```{r data load, warning=FALSE}
+dfr <- vroom::vroom("Tripadvisor.csv", delim = ",", col_names = TRUE)
+dfr
+```
+
+
+```{r glimpse}
 # str(dfr)
 dfr %>% glimpse()
 ```
 
 
-* 1) Study the different categorical variables: frequencies, proportions, charts.
-
-```{r}
+```{r select character}
 dfr %>% 
         select_if(is.character)
 ```
 
 Conversion des chaine des caractère en facteurs.
 
-```{r}
+```{r convert to factor}
 df_clean <- dfr %>% mutate_if(is.character, factor)
 ```
 
 
 Summary & Barplot
 
-```{r}
+```{r global summary}
 summary(df_clean)
 ```
 
 Pour une var
 
-```{r}
+```{r city barplot}
 df_clean %>% 
-        # ggplot(aes(x = City)) + geom_bar() +coord_flip()
         count(City) %>%
         ggplot(aes(x = forcats::fct_reorder(City, .x = n), y = n)) +
         geom_bar(stat = "identity") +
@@ -93,7 +102,7 @@ df_clean %>%
 
 Croisée quali / quali
 
-```{r}
+```{r }
 df_clean %>% 
         group_by(City, PriceRange) %>% 
         summarise(nb = n()) %>% 
@@ -105,8 +114,6 @@ df_clean %>%
 
 
 ```{r}
-library(forcats)
-
 df_clean %>% 
         transmute(CookType1 = forcats::fct_lump(f = CookType1, prop = .01))
 
@@ -130,11 +137,6 @@ df_cook %>%
 #         slice(1:20)
 
 # ggplot(df_p, aes(x = CookType1, y = nb)) + geom_col() + coord_flip()
-```
-
-
-```{r}
-
 ```
 
 
@@ -176,14 +178,3 @@ summary(lm_mod2)
 ```
 
 
-* 2) Study the different quantitative variables:  descriptives statistics, charts.
-
-* 3) Study associations between categorical variables.
-
-* 4) Study associations between quantitative variables and categorical variables.
-
-* 5) Perform t-tests to compare pairwise the rating or the number of reviews of some cities.
-
-* 6) Perform an ANOVA to compare the rating or the number of reviews depending on the city. 
-
-## WORLD HAPPINESS REPORT
