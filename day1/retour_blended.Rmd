@@ -130,6 +130,8 @@ lm_mod
 
 ```{r}
 cor(google$facebook, google$data_viz)
+
+
 ```
 
 ## test pour modalités
@@ -138,8 +140,6 @@ cor(google$facebook, google$data_viz)
 google %>% 
         ggplot(aes(x= stats_ed, y = data_viz, fill = stats_ed)) +
         geom_boxplot()
-# google$stats_ed
-
 ```
 
 
@@ -148,9 +148,9 @@ groups <- split(google$data_viz, google$stats_ed)
 
 t.test(x= groups$no, y = groups$yes)
 
-t.test(x = data_viz ~ stats_ed, data = google)
+t.test(data_viz ~ stats_ed, data = google)
 
-anova(object = data_viz ~ stats_ed, data = google)
+anova(object = lm(data_viz ~ stats_ed, data = google))
 ```
 
 
