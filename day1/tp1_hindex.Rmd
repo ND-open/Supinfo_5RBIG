@@ -1,0 +1,40 @@
+---
+title: "TP1 - Is the World Happy ?"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## About
+
+Source : https://worldhappiness.report/ed/2019/#read
+
+Meaning of the variables : https://s3.amazonaws.com/happiness-report/2019/WHR19_Ch2A_Appendix1.pdf
+
+## To Do
+
+1) Study the different quantitative variables:  descriptives statistics, charts.
+
+2) Compute a correlation matrix for the different quantitative variables. Interpret.
+
+3) Draw a scatterplot matrix for the different quantitative variables.
+
+4) Perform some simple regressions between couples of quantitative variables.
+
+5) Perform a multiple regression between the happiness score and the other quantitative variables.
+
+6) Study how the happiness score depends on the region.
+Use libraries "choroplethr" and "choroplethrMaps" to make a world map of the happiness score.
+
+```{r}
+# getwd()
+hp <- vroom::vroom("worldHappinessReport.csv", col_names = TRUE, skip = 1)
+names(hp) <- c("Country","Happiness","GDP","SocialSupport","Health","Freedom","Generosity","Corruption","PositiveAffect","NegativeAffect","ConfidenceInGovernment","Region")
+```
+```{r}
+library(dplyr)
+hp %>% glimpse()
+```
+
