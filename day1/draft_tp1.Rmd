@@ -104,6 +104,37 @@ df_clean %>%
 
 
 
+```{r}
+library(forcats)
+
+df_clean %>% 
+        group_by(CookType1) %>% # CookType2
+        summarise(nb = n(), m_rating = mean(Rating, na.rm = TRUE)) %>% 
+        arrange(- nb) %>% 
+        slice(1:20) %>% 
+        ggplot(aes(x = forcats::fct_reorder(CookType1, nb), y = nb)) + geom_col() + coord_flip()
+
+
+# df_p <- df_clean %>% 
+#         group_by(CookType1) %>% # CookType2
+#         summarise(nb = n(), m_rating = mean(Rating, na.rm = TRUE)) %>% 
+#         arrange(- nb) %>% 
+#         slice(1:20)
+
+# ggplot(df_p, aes(x = CookType1, y = nb)) + geom_col() + coord_flip()
+```
+
+
+```{r}
+# boxplot notes / type de cuisine (+ par villes ?)
+```
+
+
+```{r}
+#  NumberOfReviews ---> rating ?
+```
+
+
 * 2) Study the different quantitative variables:  descriptives statistics, charts.
 
 * 3) Study associations between categorical variables.
