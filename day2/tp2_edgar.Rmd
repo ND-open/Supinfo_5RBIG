@@ -220,3 +220,40 @@ df_stats %>%
 ```
 
 
+* 5) Compute the mean of emissions by country over the years. Draw a bar chart. Interpret.
+
+
+```{r}
+df_omit %>% 
+        group_by(country_name, year) %>% 
+        summarise(m = mean(gaz_emission)) %>% 
+        filter(country_name == "United States") %>% 
+        
+        ggplot(aes(x = year, y = m)) +
+        # geom_point()
+        geom_col() +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+
+* 6) Perform some regressions, by sector or by country, depending on years. Make predictions. Draw the corresponding scatterplots. Compute the regression coefficients.
+
+
+Effectuer un model qui prédit par année les émissions pour USA, ou pour le secteur transport. 
+
+```{r}
+# !!! filter
+
+lm(my_target ~ ., data = mydata)
+
+lm(my_target ~ var1 + var2 , data = mydata)s
+```
+
+
+* 7) Perform a regression with the total of all emissions (i.e. for all countries and all sectors) depending on years. Make predictions.
+
+
+<!-- ---- -->
+
+### Serie temporelle
+

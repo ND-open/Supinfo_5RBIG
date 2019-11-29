@@ -22,3 +22,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
   * 3) Add a variable General Position which summarize the variable Position in four
 values: "DEF" (for "RCB","CB","LCB","LB","RB","RWB","LWB"), "MID" (for "RCM","LCM","LDM","CAM","CDM","RM","LAM","LM","RDM","CM","RAM"), "FWD" (for "RF","ST","LW","LF","RS","LS","RW","CF") and "GK" (for "GK"). What is the interest of doing that?
+
+
+```{r}
+library(tidyverse)
+
+
+```
+
