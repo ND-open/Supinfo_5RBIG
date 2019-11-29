@@ -23,17 +23,120 @@ Ces données contiennent les mesures (largeur et longueur) des pétales et sépa
   
   Pour la variable factorielle : trouvez ses occurences.
   
+```{r}
+# --- Var numeriques
+summary(iris)
+psych::describe(iris[,-5]) # attention résultats erronés pour Species
+
+mean(iris$Sepal.Length)
+median(iris$Sepal.Length)
+sd(iris$Sepal.Length) # ecart type
+var(iris$Sepal.Length)
+
+# Species
+table(iris$Species)
+str(iris$Species)
+# head( iris[["Species"]] )
+
+iris %>% 
+  as_tibble() %>% 
+  group_by(Species) %>% 
+  summarise_all(.funs = ~mean(.) )
+```
+  
+  
 2) Représentez un scatter plot des variables numériques (quanti / quanti)
 
+
+```{r}
+# plot(iris)
+pairs(iris[,-5], col = iris$Species) # <-> plot(iris[,-5])
+plot(iris$Sepal.Length, iris$Sepal.Width, col = iris$Species)
+```
+
+
+```{r}
+library(ggplot2)
+ggplot(iris, aes(Sepal.Length, Sepal.Width, colour = Species)) +
+  geom_point()
+
+# --- répétable n fois
+```
+
+
+```{r}
+# --- ou utiliser l'équivalent ggplot2 de pairs 
+GGally::ggpairs(iris[,-5], aes(colour = iris$Species)) 
+```
+
+
 3) Réprésentez la variabilité de `Sepal.Length` selon l'espèce d'iris choisie (quanti / quali)
+
+
+```{r}
+library(dplyr)
+iris %>% 
+  ggplot(aes(x = Species, y = Sepal.Length, fill = Species)) +
+  geom_boxplot(alpha = .5) +
+  geom_point(aes(y = mean(Sepal.Length),  colour = "red"), show.legend = FALSE)
+
+iris %>% 
+  ggplot(aes(x = Petal.Width, fill = Species)) + # Sepal.Length
+  geom_density(alpha = .4)
+# si > 1.6 --> virginica
+# si > 2 --> virginica
+# si > 1.2 --> virginica
+```
+
 
 4) Proposez un ou plusieurs critères pour classer les espèces d'iris à partir des seules varaibles quantitatives.
 
 Aide : On pourra faire une première hypothèse à partir des diagrammes puis affiner/infirmer ces hypothèses avec des test statistiques, des modèles, ...
 
 
+Tester / Vérifier les hypothèses :
 
+```{r}
+df_test <- iris[,-5]
+df_test$pred <- "unkown"
+for(i in 1:150){
+  if(df_test$Petal.Length[i] < 2){
+    df_test$pred[i] <- "setosa"
+  }else{
 
+# si > 1.6 --> virginica
+# si > 2 --> virginica
+# si > 1.2 --> virginica
+    
+  if(df_test$Petal.Width[i] > 2){
+    df_test$pred[i] <- "virginica"
+  }
+    }
+    
+  
+}
+df_test
+
+table(df_test$pred, iris$Species)
+# 35/150
+# 6/150 --> 
+```
+
+# ML
+
+```{r}
+lm_mod <- lm(Species ~ ., data = iris)
+
+df_test <- iris
+df_test$Species <- ifelse(iris$Species == "setosa", 1, 0)
+
+lm_mod <- lm(Species ~ 0 + ., data = df_test)
+summary(lm_mod)
+
+setosa_pred <- predict(lm_mod, df_test[,-5])
+setosa_pred <- data.frame("ind" = 1:150, "pred" = setosa_pred)
+ggplot(setosa_pred, aes(ind, pred))+ geom_point()
+```
 
 
 

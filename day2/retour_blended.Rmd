@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 
 # Read in the coal dataset
-coal <- read_csv("http://594442.youcanlearnit.net/coal.csv")
+# coal <- read_csv("http://594442.youcanlearnit.net/coal.csv")
 # glimpse(coal)
 
 # Skip the first two lines
@@ -24,14 +24,38 @@ coal <- read_csv("http://594442.youcanlearnit.net/coal.csv", skip=2)
 # Rename the first column as region
 colnames(coal)[1] <- "region"
 # summary(coal)
+coal
 ```
 
 1) From long to wide
 
 What for --> representation as time serie with year and coal_consuption as new variables
 
+ex :
+```{r}
+stocks <- tibble(
+  time = as.Date('2009-01-01') + 0:9,
+  X = rnorm(10, 0, 1),
+  Y = rnorm(10, 0, 2),
+  Z = rnorm(10, 0, 4)
+)
+stocks
+names(stocks)[-1] # donne les noms des variables exceoté le 1er : Time
+gather(stocks, "stock", "price", -time)
+stocks %>% gather(data = ., key = "stock",value = "price", -time) # %>% spread(data = ., key = "stock", value = "price")
+```
+
+
 ```{r}
 head(coal)
+
+coal_long <- coal %>% 
+        gather(data = ., key = "year", value = "coal_consuption", -region)
+
+# coal_long %>% 
+        # ggplot(., aes(year, coal_consuption)) + # colour = region
+        # geom_line()
+        # geom_point()
 
 # coal_tidy <- coal %>% 
 #   pivot_longer(., cols = names(coal)[-1], names_to = "year", values_to = "coal_consuption")
@@ -39,7 +63,31 @@ head(coal)
 # coal_tidy %>% ggplot ...
 ```
 
-
 2) Conversely : wide to long (for practice only)
 
+
+```{r}
+coal_long %>% 
+        spread(key = "year", value = "coal_consuption")
+```
+
+3) Unit vs separate
+
+```{r}
+# --- fake id
+coal_long$region <- paste0(1:6960, "_", coal_long$region)
+coal_long
+```
+
+
+
+
+
+
+```{r}
+# separate
+coal_long %>% 
+        separate(data = ., col = "region", into = c("id", "region"), sep = "_") %>%
+        unite(data = ., col = "id_r", id, region)
+```
 

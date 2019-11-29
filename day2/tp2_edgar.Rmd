@@ -12,7 +12,11 @@ knitr::opts_chunk$set(echo = TRUE)
 * 1) Is this data set tidy? If not, change its format.
 Have a look on the variable "year".
 
+<No>
+
 * 2) If we want to make totals by country, by sector or by year, can we just add some information to the previous data set? 
+
+<No> the data won't be tidy anymore.
 
 * 3) Use the help to understand how the "aggregate" function works. Alternatively, you can also use the functions "group_by" and "summarize".
 
@@ -23,3 +27,196 @@ Have a look on the variable "year".
 * 6) Perform some regressions, by sector or by country, depending on years. Make predictions. Draw the corresponding scatterplots. Compute the regression coefficients.
 
 * 7) Perform a regression with the total of all emissions (i.e. for all countries and all sectors) depending on years. Make predictions.
+
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+dfr <- readxl::read_excel("edgar.xlsx")
+dfr %>% glimpse()
+```
+
+Remarques : 
+
+* non tidy, format long nécessaire
+* type des variables à revoir 
+* les valeurs NULL sont à traiter
+
+
+
+
+
+
+------------------------------------------------------------------------------------
+
+* Le jeux de données n'est pas au format "tidy"
+* 
+
+```{r}
+tidy_dfr <- dfr %>% 
+        pivot_longer(data = ., cols = names(dfr)[-c(1:2)], names_to = "year", values_to = "gaz_emission")
+# gather
+
+tidy_dfr
+tidy_dfr %>% glimpse()
+```
+
+## Data cleaning
+
+```{r}
+# --- Numeric
+# tidy_dfr$gaz_emission <- as.numeric(tidy_dfr$gaz_emission)
+tidy_dfr <- tidy_dfr %>% 
+        mutate(gaz_emission = as.numeric(gaz_emission))
+
+# --- Factor
+# tidy_dfr$Sector <- as.factor(tidy_dfr$Sector)
+tidy_dfr <- tidy_dfr %>%
+        mutate_if(.predicate = is.character, .funs = factor)
+
+tidy_dfr %>% glimpse
+```
+
+### Stats
+
+```{r}
+summary(tidy_dfr)
+```
+
+Special values (NULL, NA, NaN, Inf)
+
+```{r}
+apply(tidy_dfr, 2, function(x) sum(is.null(x)))
+apply(tidy_dfr, 2, function(x) sum(is.na(x)))
+apply(tidy_dfr, 2, function(x) sum(is.nan(x)))
+apply(tidy_dfr, 2, function(x) sum(is.infinite(x)))
+
+# plus générique
+# apply(tidy_dfr, 2, function(x) sum(is.finite(x))/length(x) )
+# is.finite(1)
+# is.finite(("a"))
+# is.finite((NA))
+# is.finite((NaN))
+# is.finite((Inf))
+# sum(is.finite ( tidy_dfr$gaz_emission[1:5] ) )
+# apply(tidy_dfr, 2, function(x) x[1])
+# tidy_dfr %>% glimpse()
+```
+
+I choose to omit NA :
+
+```{r}
+# tidy_dfr <- tidy_dfr[ - is.na(tidy_dfr$gaz_emission) , ]
+df_omit <- na.omit(tidy_dfr)
+```
+
+<!-- Choix explicite -->
+
+### Viz
+
+Filter use
+
+```{r}
+df_omit %>%
+        # tidy_dfr %>% 
+        filter(gaz_emission < 100) %>% 
+        
+        ggplot(aes(x = Sector, y = gaz_emission)) +
+        geom_boxplot()
+```
+
+
+Stats
+
+```{r}
+aggregate(df_omit$gaz_emission, by = list(Sector = df_omit$Sector), FUN = mean )
+# plyr::
+
+df_omit %>% 
+        group_by(Sector) %>% 
+        summarise(mean_ge = mean(gaz_emission))
+
+# psych::describe(df_omit$gaz_emission)
+
+df_omit %>% 
+        plyr::ddply(.data = ., .variables = "Sector", .fun = summarize,
+                    nb = n(),
+                    mean = round(mean(gaz_emission), 2),
+                    sd = round(sd(gaz_emission), 2),
+                    median = round(median(gaz_emission), 2),
+                    q10 = round(quantile(gaz_emission, probs = .10), 2),
+                    q25 = round(quantile(gaz_emission, probs = .10), 2),
+                    q75 = round(quantile(gaz_emission, probs = .10), 2),
+                    q90 = round(quantile(gaz_emission, probs = .10), 2),
+                    min = round(min(gaz_emission), 2),
+                    max = round(max(gaz_emission), 2)
+        )
+
+df_omit %>% 
+        group_by(country_name) %>% 
+        summarise_at(.tbl = ., .vars = "gaz_emission",
+                     .funs = list(nb = ~n(),
+                                  mean = ~round(mean(.), 2),
+                                  sd = ~round(sd(.), 2), 
+                                  median = ~round(median(.), 2),
+                                  q10 = ~round(quantile(., probs = .10), 2),
+                                  q25 = ~round(quantile(., probs = .10), 2),
+                                  q75 = ~round(quantile(., probs = .10), 2),
+                                  q90 = ~round(quantile(., probs = .10), 2),
+                                  min = ~round(min(.), 2),
+                                  max = ~round(max(.), 2)
+                     )) %>% 
+        arrange(-mean)
+```
+
+Résumé des émissions,
+
+```{r}
+# unique(df_omit$country_name) 
+france_levels <- c("France and Monaco") #, "French Guiana", "French Polynesia") 
+france_b <- df_omit %>%
+        filter(country_name %in% france_levels) %>% 
+        group_by(country_name, Sector) %>% 
+        summarise(total = sum(gaz_emission)) %>% 
+        arrange(-total)
+
+france_b %>% 
+        ggplot(aes(Sector, total, fill = country_name)) +
+        # geom_point() +
+        geom_col() +
+        # geom_dotplot() +
+        # geom_col(alpha = .5, position = "") +
+        coord_flip()
+          
+```
+
+```{r}
+df_stats <-df_omit %>%
+        group_by(country_name, year) %>% 
+        summarise(total = sum(gaz_emission)) %>% 
+        arrange(-total) %>% 
+        filter(country_name %in% c("United States", "China", "Russia") )
+
+df_stats %>% 
+        ggplot(aes(year, total, colour = country_name)) +
+        geom_point() +
+        geom_line()
+        # theme(axis)
+
+df_stats <-df_omit %>%
+        group_by(country_name, year) %>% 
+        summarise(tot_mean = mean(gaz_emission)) %>% 
+        arrange(-tot_mean) %>% 
+        filter(country_name %in% c("United States", "China", "Russia") )
+
+df_stats %>% 
+        ggplot(aes(year, tot_mean, colour = country_name)) +
+        geom_point() +
+        # geom_line() +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+
