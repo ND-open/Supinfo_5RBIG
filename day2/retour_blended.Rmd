@@ -1,0 +1,45 @@
+---
+title: "Retour sur le Blended cours"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## The Coal dataset usecase
+
+```{r}
+library(tidyverse)
+
+# Read in the coal dataset
+coal <- read_csv("http://594442.youcanlearnit.net/coal.csv")
+# glimpse(coal)
+
+# Skip the first two lines
+coal <- read_csv("http://594442.youcanlearnit.net/coal.csv", skip=2)
+# glimpse (coal)
+
+# Rename the first column as region
+colnames(coal)[1] <- "region"
+# summary(coal)
+```
+
+1) From long to wide
+
+What for --> representation as time serie with year and coal_consuption as new variables
+
+```{r}
+head(coal)
+
+# coal_tidy <- coal %>% 
+#   pivot_longer(., cols = names(coal)[-1], names_to = "year", values_to = "coal_consuption")
+
+# coal_tidy %>% ggplot ...
+```
+
+
+2) Conversely : wide to long (for practice only)
+
+

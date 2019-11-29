@@ -1,0 +1,39 @@
+---
+title: "Activité Rapide 2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Prérequis : enregistrez votre version `Rmd` d'Activité rapide (type `mon_ar2.Rmd`)
+
+
+#### Etude du jeux de données `iris` avec RStudio
+
+Ces données contiennent les mesures (largeur et longueur) des pétales et sépales de trois espèces de iris.
+
+1) Calculez les statistiques suivantes (pour les variables numériques) :
+
+  * la moyenne
+  * la médiane
+  * la variance
+  * l'écart type
+  
+  Pour la variable factorielle : trouvez ses occurences.
+  
+2) Représentez un scatter plot des variables numériques (quanti / quanti)
+
+3) Réprésentez la variabilité de `Sepal.Length` selon l'espèce d'iris choisie (quanti / quali)
+
+4) Proposez un ou plusieurs critères pour classer les espèces d'iris à partir des seules varaibles quantitatives.
+
+Aide : On pourra faire une première hypothèse à partir des diagrammes puis affiner/infirmer ces hypothèses avec des test statistiques, des modèles, ...
+
+
+
+
+
+
+
