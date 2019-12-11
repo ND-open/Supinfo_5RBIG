@@ -25,14 +25,14 @@ stocks <- tibble(
 )
 ```
 
-#### From long to wide
+#### 1) Reshape the data from long to wide format
 
-#### From wide to long
+#### 2) Reshape the resulting data from wide to long format
 
-#### Separate id into id and num_id
+#### 3) Separate id into id and num_id
 
-#### Undo the separate operation
+#### 4) Undo the separate operation
 
-#### Plot the evolution of X, Y and Z depending on time
+#### 5) Plot the evolution of X, Y and Z depending on time
 
 
