@@ -9,18 +9,18 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## To Do
 
-  * 1) Clean the data set and in particular these variables:
-    + Height: conversion into centimeters.
-    + Weight: conversion into kilograms.
-    + Wage, Value and Release Clause: conversion into euros (take a look at the
-  functions "mutate" and "ifelse").
-    + Body Type.
-    + Work Rate.
-    + etc.
+* 1) Clean the data set and in particular these variables:
++ Height: conversion into centimeters.
++ Weight: conversion into kilograms.
++ Wage, Value and Release Clause: conversion into euros (take a look at the
+functions "mutate" and "ifelse").
++ Body Type.
++ Work Rate.
++ etc.
 
-  * 2) Check for outliers.
+* 2) Check for outliers.
 
-  * 3) Add a variable General Position which summarize the variable Position in four
+* 3) Add a variable General Position which summarize the variable Position in four
 values: "DEF" (for "RCB","CB","LCB","LB","RB","RWB","LWB"), "MID" (for "RCM","LCM","LDM","CAM","CDM","RM","LAM","LM","RDM","CM","RAM"), "FWD" (for "RF","ST","LW","LF","RS","LS","RW","CF") and "GK" (for "GK"). What is the interest of doing that?
 
 
@@ -30,44 +30,152 @@ library(tidyverse)
 
 
 ```{r}
-dfr <- read_csv("FIFA.csv")
+dfr <- readr::read_csv("../day2/FIFA.csv")
 dfr
+
+# as.numeric("93+2")
 ```
-
-
-```{r}
-dfr %>% 
-  transmute(Height) %>% 
-  separate(col = Height, into = c("foot", "inch")) %>% glimpse
-  # mutate(fcm = 30*foot)
-```
-
 
 Conversions :
-1 inch <-> 2.54 cm
-1 foot <-> 30.48 cm (Height)
+* 1 inch <-> 2.54 cm
+* 1 foot <-> 30.48 cm (Height)
 
-1lbs (pound) <-> 453.592 g (Weight)
+* 1lbs (pound) <-> 453.592 g (Weight)
 
-1£ <-> 1.17 € (Wage, Value and Release Clause)
+* 1£ <-> 1.17 € (Wage, Value and Release Clause)
 
-Body Type : operation avec forcats
-Work Rate :
+* Body Type : operation avec forcats
+* Work Rate : smt to do ?
 
 
---- test package measurements
+Comment effectuer des modifications dans DF, utiliser `mutate` ou `transmute`.
+
 ```{r}
-# 5'7
-measurements::conv_dim(x = "5'7", x_unit = "inch", trans = "cm", )
+dfr_clean <- dfr %>%  
+  separate(col = Height, into = c("foot", "inch")) %>% # glimpse
+  mutate(Height = 30.48*as.numeric(foot) + 2.54*as.numeric(inch) )
 ```
 
+
+```{r}
+# dfr_clean$Weight %>% substr(x = ., start = 1, stop = length(Weight)-3) ### ! error
+dfr_clean <- dfr_clean %>%
+  mutate(Weight = substr(x = Weight, start = 1, stop = nchar(Weight)-3)) # transmute
+```
+
+
+```{r}
+# 1£ <-> 1.17 €
+# ratio_livre_eur <- 1.17
+dfr_clean %>% 
+  select(Value, Wage) %>% # glimpse
+  mutate(currency = substr(Value, 1, 1), 
+         Value = substr(Value, 2, nchar(Value)),
+         Wage = substr(Wage, 2, nchar(Wage))
+  ) %>% 
+  mutate(power = substr(Value, nchar(Value), nchar(Value)),  #) %>%  select(power) %>% unique
+         Value = substr(Value, 1, nchar(Value)-1),
+         Value = case_when(
+           power == "M" ~ as.numeric(Value)*1e6,
+           power == "K" ~ as.numeric(Value)*1e3,
+           power == "0" ~ as.numeric(Value)
+         ) ) %>% 
+  mutate(  #) %>%  select(power) %>% unique
+    power2 = substr(Wage, nchar(Wage), nchar(Wage)),
+    Wage2 = substr(Wage, 1, nchar(Wage)-1),
+    Wage2 = case_when(
+      power2 == "M" ~ as.numeric(Wage2)*1e6,
+      power2 == "K" ~ as.numeric(Wage2)*1e3,
+      power2 == "0" ~ as.numeric(Wage2)
+    ) ) %>% glimpse()
+  # select(power2) %>% unique()
+```
+
+```{r}
+dfr_clean %>% 
+  select(`Work Rate`) %>%  # %>% 
+  # unique()
+  group_by(`Work Rate`) %>% 
+  summarise(nb = n()) %>% 
+  arrange(-nb)
+
+dfr_clean %>% 
+  select(`Body Type`) %>%  # %>% 
+  # unique()
+  group_by(`Body Type`) %>% 
+  summarise(nb = n()) %>% 
+  arrange(-nb)
+  # ggplot( aes(x = `Body Type`, y = nb)) +
+  # geom_col()
+
+dfr_final <- dfr_clean %>% 
+  mutate_if(.predicate = is.character, .funs = factor) %>% 
+  mutate_if(.predicate = is.factor, .funs = ~fct_explicit_na(.))
+
+dfr_final %>% 
+  select(`Body Type`) %>%
+  group_by(`Body Type`) %>% 
+  summarise(nb = n()) %>% 
+  arrange(-nb)
+```
 
 
 ### Outliers
 
 
+### Stats aggregatting
 
-## ---
 
 3) Add a variable General Position which summarize the variable Position in four values: "DEF" (for "RCB","CB","LCB","LB","RB","RWB","LWB"), "MID" (for "RCM","LCM","LDM","CAM","CDM","RM","LAM","LM","RDM","CM","RAM"), "FWD" (for "RF","ST","LW","LF","RS","LS","RW","CF") and "GK" (for "GK"). What is the interest of doing that?
 
+```{r}
+# def_vars <- c("RCB","CB","LCB","LB","RB","RWB","LWB")
+# mid_vars <- c("RCM","LCM","LDM","CAM","CDM","RM","LAM","LM","RDM","CM","RAM")
+# fwd_vars <- c("RF","ST","LW","LF","RS","LS","RW","CF")
+# 
+# dfr_final <- dfr_final %>% 
+#   # glimpse
+#   # select(def_vars) %>%
+#   # mutate_all(.funs = function(x) as.numeric( substr(x, 1, 2)) )
+#   mutate_at(.vars = c(def_vars, mid_vars, fwd_vars), .funs = function(x) as.numeric( substr(x, 1, 2)) ) %>% 
+#   select(RCB)
+#   
+# dfr_final %>% 
+#   transmute("RCB",
+#     def = mean(c("RCB","CB","LCB","LB","RB","RWB","LWB"), na.rm=TRUE ) )
+```
+
+
+## 
+
+```{r}
+names(dfr_final)
+dfr_final %>% select(Weight)
+dfr_final %>% 
+  glimpse()
+```
+
+
+
+1) Study the main quantitative variables: descriptives statistics, charts, confidence intervals, relevant statistical tests, etc.
+Who are the top 100 players according to the variable "Overall"? Which are their clubs and nationalities? What is the proportion of their wage compare to the total wage of all players?
+
+2) Study the age dependance of main quantitative variables.
+
+3) Study the different categorical variables: frequencies, proportions, charts.
+
+4) Does the preferred food have an impact on the other variables? Is the proportion of left-handed footballers conform to all humans?
+
+5) Study the influence of the variable "Position" on the variables "Value" and "Overall". 
+
+6) Same thing with the variable "General Position".
+
+7) Study and represent the dependencies between the main categorical variables.
+
+8) Study the association between the variables "Value" and "Overall". Is a linear regression relevant? Perform an exponential regression.
+
+9) Study and represent the variable "Value" in function of the variable "Club" (we will limit ourselves to the 15 main clubs according to global overall). Same thing for the variables "Overall" and "Potential". Interpret. Compare your favorite clubs.
+
+10) Use the library "wordcloud2" to represent the players' nationalities with a word-cloud chart.
+
+11) Use the library "fmsb" to represent the main characteristics of top players with a radar chart. Which are the limits of this kind of chart?
