@@ -243,17 +243,66 @@ Effectuer un model qui prédit par année les émissions pour USA, ou pour le se
 
 ```{r}
 # !!! filter
+df_usa <- df_omit %>%
+        filter(country_name == "United States", Sector == "Transport") %>% 
+        mutate(year2 = 1:length(year))
+        
 
-lm(my_target ~ ., data = mydata)
+mod <- lm(gaz_emission ~ 0 + year2, data = df_usa)
+summary(mod)
 
-lm(my_target ~ var1 + var2 , data = mydata)s
+df_usa %>% ggplot(aes(x = year2, y = gaz_emission)) +
+        geom_point() +
+        geom_smooth(method = "lm")
+
+# look at the past
+df_usa2 <- df_usa %>% mutate(
+        past1 = lag(gaz_emission),
+        past2 = lag(gaz_emission, n = 2),
+        past3 = lag(gaz_emission, n = 3)
+)
+
+df_usa2 <- na.omit(df_usa2)
+df_usa2$country_name <- NULL
+
+mod2 <- lm(gaz_emission ~ ., data = df_usa2)
+summary(mod2)
+
+# lm(my_target ~ var1 + var2 , data = mydata)
 ```
 
 
 * 7) Perform a regression with the total of all emissions (i.e. for all countries and all sectors) depending on years. Make predictions.
 
 
-<!-- ---- -->
+```{r}
+# !!! filter
+# d_all<- df_omit %>% 
+#         group_by(year) %>% # , Sector, country_name
+#         summarise(total = sum(gaz_emission))
+#         
+d_all %>% ggplot(aes(1:length(year), total)) +
+        geom_point() +
+        geom_smooth(method = "lm") +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
-### Serie temporelle
+
+# df_omit2 <- df_omit %>% 
+#         (
+#         past1 = lag(gaz_emission),
+#         past2 = lag(gaz_emission, n = 2),
+#         past3 = lag(gaz_emission, n = 3)
+# )
+
+# mod3 <- lm(gaz_emission ~ 0 + year, data = df_omit)
+# summary(mod3)
+```
+
+
+### ST
+
+```{r}
+# d_ts <- ts(d_all)
+# HoltWinters(x = d_ts, gamma = 0)
+```
 

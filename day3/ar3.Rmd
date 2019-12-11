@@ -1,0 +1,38 @@
+---
+title: "Activité Rapide 3"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Prérequis : enregistrez votre version `Rmd` d'Activité rapide (type `mon_ar3.Rmd`)
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+set.seed(123)
+stocks <- tibble(
+  id = paste0("ID_", 0:9),
+  time = as.Date('2009-01-01') + 0:9,
+  X = rnorm(10, 0, 1),
+  Y = rnorm(10, 0, 2),
+  Z = rnorm(10, 0, 4)
+)
+```
+
+#### From long to wide
+
+#### From wide to long
+
+#### Separate id into id and num_id
+
+#### Undo the separate operation
+
+#### Plot the evolution of X, Y and Z depending on time
+
+
