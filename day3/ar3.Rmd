@@ -25,14 +25,54 @@ stocks <- tibble(
 )
 ```
 
-#### 1) Reshape the data from long to wide format
+#### 1) Reshape the data from wide to long format
 
-#### 2) Reshape the resulting data from wide to long format
+```{r}
+# stocks_long <- gather(data = stocks, key = "xyz_var", value = "value", -id, -time)
+
+stocks_long <- pivot_longer(data = stocks, cols = c("X", "Y", "Z"))
+```
+
+
+#### 2) Reshape the resulting data from long to wide format
+
+```{r}
+# spread(data = stocks_long, )
+stocks_wide <- stocks_long %>%
+  spread(data = ., key = "name", value = "value")
+
+stocks_wide <- stocks_long %>%
+  pivot_wider(data = ., names_from = "name", values_from = "value")
+```
+
 
 #### 3) Separate id into id and num_id
 
+```{r}
+stocks_separate <- stocks_long %>% 
+  separate(data = ., col = "id", into = c("id", "num_id"), sep = "_")
+```
+
+
 #### 4) Undo the separate operation
+
+```{r}
+stocks_separate %>% 
+  unite(data = ., col = "new_id", c("id", "num_id"))
+  # unite(data = ., col = "new_id", id, num_id) # tidy eval / rlang 
+```
+
 
 #### 5) Plot the evolution of X, Y and Z depending on time
 
+```{r}
+stocks_long %>% 
+  ggplot(., aes(x = time, y = value, colour = name) ) +
+  geom_point() + # alpha = 1
+  geom_line() +
+  xlab("Evolution dans le Temps") +
+  ylab("Valeurs") +
+  labs(title = "AR3 graphics") +
+  theme_dark()
+```
 
