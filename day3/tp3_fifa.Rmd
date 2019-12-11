@@ -1,0 +1,73 @@
+---
+title: "TP2 - FIFA"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## To Do
+
+  * 1) Clean the data set and in particular these variables:
+    + Height: conversion into centimeters.
+    + Weight: conversion into kilograms.
+    + Wage, Value and Release Clause: conversion into euros (take a look at the
+  functions "mutate" and "ifelse").
+    + Body Type.
+    + Work Rate.
+    + etc.
+
+  * 2) Check for outliers.
+
+  * 3) Add a variable General Position which summarize the variable Position in four
+values: "DEF" (for "RCB","CB","LCB","LB","RB","RWB","LWB"), "MID" (for "RCM","LCM","LDM","CAM","CDM","RM","LAM","LM","RDM","CM","RAM"), "FWD" (for "RF","ST","LW","LF","RS","LS","RW","CF") and "GK" (for "GK"). What is the interest of doing that?
+
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+dfr <- read_csv("FIFA.csv")
+dfr
+```
+
+
+```{r}
+dfr %>% 
+  transmute(Height) %>% 
+  separate(col = Height, into = c("foot", "inch")) %>% glimpse
+  # mutate(fcm = 30*foot)
+```
+
+
+Conversions :
+1 inch <-> 2.54 cm
+1 foot <-> 30.48 cm (Height)
+
+1lbs (pound) <-> 453.592 g (Weight)
+
+1£ <-> 1.17 € (Wage, Value and Release Clause)
+
+Body Type : operation avec forcats
+Work Rate :
+
+
+--- test package measurements
+```{r}
+# 5'7
+measurements::conv_dim(x = "5'7", x_unit = "inch", trans = "cm", )
+```
+
+
+
+### Outliers
+
+
+
+## ---
+
+3) Add a variable General Position which summarize the variable Position in four values: "DEF" (for "RCB","CB","LCB","LB","RB","RWB","LWB"), "MID" (for "RCM","LCM","LDM","CAM","CDM","RM","LAM","LM","RDM","CM","RAM"), "FWD" (for "RF","ST","LW","LF","RS","LS","RW","CF") and "GK" (for "GK"). What is the interest of doing that?
+

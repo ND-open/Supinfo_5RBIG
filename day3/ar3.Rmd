@@ -67,12 +67,28 @@ stocks_separate %>%
 
 ```{r}
 stocks_long %>% 
+  filter(name == "X") %>% 
   ggplot(., aes(x = time, y = value, colour = name) ) +
   geom_point() + # alpha = 1
   geom_line() +
+  geom_smooth(method = "lm", level = c(.5) ) +
   xlab("Evolution dans le Temps") +
   ylab("Valeurs") +
   labs(title = "AR3 graphics") +
-  theme_dark()
+  # theme_dark()
+  theme_light()
 ```
+
+```{r}
+# set.seed(123)
+# dfr <- tibble(y = rnorm(1e3, 0, 1),
+#               x = 1 + y + rnorm(1e3, 0, .1))
+
+# dfr %>% C
+  # ggplot(., aes(x = x, y=y))+
+  # geom_point(alpha = .1) +
+  # geom_smooth(method = "lm", level = .95)+
+  # theme_classic()
+```
+
 
