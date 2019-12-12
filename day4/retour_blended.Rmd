@@ -14,10 +14,15 @@ library(tidyverse)
 
 ## 0 - More on R stats
 
-1) Anova
+1) Regression multiple Anova
 
 ```{r}
 iris
+lm_mod <- lm(formula = Sepal.Length ~ ., data = iris)
+lm_mod
+
+summary(lm_mod)
+anova(lm_mod)
 ```
 
 
@@ -25,6 +30,41 @@ iris
 
 ```{r}
 data(mtcars)
+
+?hclust
+mtcars1 <- mtcars[, c(1:4, 6:7, 9:11)]  # Select variables
+mtcars1[1:5, ]
+
+# Three major kinds of clustering:
+#   1. Split into set number of clusters (e.g., kmeans)
+#   2. Hierarchical: Start separate and combine
+#   3. Dividing: Start with a single group and split
+
+# We'll use hierarchical clustering
+# Need distance matrix (dissimilarity matrix)
+d <- dist(mtcars1)
+d  # Huge matrix
+
+# Use distance matrix for clustering
+c <- hclust(d)
+c
+
+# Plot dendrogram of clusters
+plot(c)
+
+# Put observations in groups
+# Need to specify either k = groups or h = height
+g3 <- cutree(c, k = 3)  # "g3" = "groups 3"
+# cutree(hcmt, h = 230) will give same result
+# g3
+# plot(g3)
+# Or do several levels of groups at once
+# "gm" = "groups/multiple"
+gm <- cutree(c, k = 2:5) # or k = c(2, 4)
+gm
+
+# Draw boxes around clusters
+rect.hclust(c, k = 2, border = "gray")
 ```
 
 3) PCA
