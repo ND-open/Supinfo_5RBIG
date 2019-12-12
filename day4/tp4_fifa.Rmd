@@ -133,6 +133,7 @@ dfr_final %>%
   psych::describe()
 
 dfr_final %>% 
+  filter(Wage < 9000) %>% 
   ggplot( aes(y = Wage)) +
   geom_boxplot()
 ```
@@ -229,15 +230,52 @@ Study of Wage
 
 ```{r wage study}
 df_study %>%
-  select(Wage) 
+  select(Wage)
+
+psych::describe(df_study$Wage)
+
+df_study %>%
+  select(Wage) %>% 
+  ggplot( aes(x = Wage)) +
+  geom_histogram()
+
+df_study %>%
+  select(Wage) %>% 
+  filter(Wage < 6000) %>% # unique
+  ggplot( aes(x = Wage)) +
+  geom_histogram(bins = 100)
+  
+df_study %>%
+  select(Wage) %>% 
+  filter(Wage > 6000 ) %>%
+  ggplot( aes(x = Wage)) +
+  geom_histogram(bins = 100)
+
+df_study %>%
+  select(Wage) %>% 
+  # filter(Wage > 6000 ) %>%
+  ggplot( aes(y = Wage)) +
+  geom_boxplot()
+
+df_study %>%
+  select(Wage) %>% 
+  filter(Wage < 5e4 ) %>%
+  ggplot( aes(y = Wage)) +
+  geom_boxplot()
+
+# ---
+df_study %>%
+  select(Wage) %>% 
+  filter(Wage < 5e4 ) %>%
+  ggplot( aes(x = 1, y = Wage)) +
+  geom_violin()
 ```
 
 
 2) Who are the top 100 players according to the variable "Overall"? Which are their clubs and nationalities? What is the proportion of their wage compare to the total wage of all players?
 
 ```{r overall study}
-df_study %>% 
-  # group_by(Overall) %>% 
+df_study %>%
   top_n(x = ., n = 100, wt = Overall)
 
 # df_study %>% 
