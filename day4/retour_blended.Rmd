@@ -28,6 +28,8 @@ anova(lm_mod)
 
 2) cluster analysis
 
+2.1) Hierarchical clusters
+
 ```{r}
 data(mtcars)
 
@@ -43,34 +45,62 @@ mtcars1[1:5, ]
 # We'll use hierarchical clustering
 # Need distance matrix (dissimilarity matrix)
 d <- dist(mtcars1)
-d  # Huge matrix
+# d  # Huge matrix
 
 # Use distance matrix for clustering
 c <- hclust(d)
-c
+# c
 
 # Plot dendrogram of clusters
 plot(c)
 
 # Put observations in groups
 # Need to specify either k = groups or h = height
-g3 <- cutree(c, k = 3)  # "g3" = "groups 3"
+# g3 <- cutree(c, k = 3)  # "g3" = "groups 3"
 # cutree(hcmt, h = 230) will give same result
 # g3
 # plot(g3)
 # Or do several levels of groups at once
 # "gm" = "groups/multiple"
-gm <- cutree(c, k = 2:5) # or k = c(2, 4)
+gm <- cutree(c, k = 7) # or k = c(2, 4)
 gm
 
 # Draw boxes around clusters
-rect.hclust(c, k = 2, border = "gray")
+rect.hclust(c, k = 7, border = "red")
 ```
+
+2.2) k means
+
+```{r}
+iris_num <- iris[,1:4]
+groups <- kmeans(x = iris_num, centers = 3)
+
+iris %>% 
+        ggplot(., aes(x = Sepal.Length, y = Sepal.Width, colour = factor(groups$cluster) )) +
+        geom_point()
+```
+
 
 3) PCA
 
 ```{r}
+iris_num <- iris[,1:4]
 
+?prcomp
+iris_pca <- prcomp(x = iris_num)
+summary(iris_pca)
+plot(iris_pca)
+
+biplot(iris_pca)
+```
+
+
+```{r}
+library(factoextra)
+factoextra::fviz_eig(iris_pca)
+factoextra::fviz_pca_ind(iris_pca, col.ind = iris$Species)
+factoextra::fviz_pca_var(iris_pca)
+factoextra::fviz_pca_biplot(iris_pca, col.ind = iris$Species)
 ```
 
 

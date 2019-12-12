@@ -9,13 +9,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Prérequis : enregistrez votre version `Rmd` d'Activité rapide (type `mon_ar4.Rmd`)
 
-```{r}
-library(tidyverse)
+```{r load library}
+suppressPackageStartupMessages( library(tidyverse) )
 ```
 
 1) Créez le vecteur d'entiers x = {1, 2, ..., 10} 
 
-```{r}
+```{r vecteur entier}
 1:10
 c(1:10)
 c(1,2,3,4,5,6,7,8,9,10)
@@ -25,16 +25,16 @@ seq(1, 10, length.out = 10) # by = 2
 
 2) Simuler 10 nombres issus d'une Loi Normale centrée (moyenne nulle) et réduite (variance de 1) (option par défault)
 
-```{r}
+```{r génération de nombre aléatoire}
 set.seed(123)
 rnorm(n = 10, mean = 0, sd = 1)
 # runif(10, 0, 1)
 # sample(x = 1:10, size = 10, replace = TRUE)
 ```
 
-3) Soit un x la réponse à 2), effectuer un test statistique de l'hypothèse "la moyenne de l'échantillon x est nulle et concluez.
+3) Soit un x la réponse à 2), effectuez un test statistique de l'hypothèse "la moyenne de l'échantillon x est nulle et concluez.
 
-```{r}
+```{r test de moyenne}
 x <- c(-0.560475646552213, -0.23017748948328, 1.55870831414912, 0.070508391424576, 
 0.129287735160946, 1.71506498688328, 0.460916205989202, -1.26506123460653, 
 -0.686852851893526, -0.445661970099958)
@@ -44,7 +44,7 @@ t.test(x)
 
 4) Supposons qu'une équipe E est remportée 60 matchs sur 100. Vérifiez par test statistique l'hypothèse "E remporte ses matchs avec un probabilité de 50%"
 
-```{r}
+```{r test de proportion}
 prop.test(x = 60, n = 100)
 ```
 
@@ -52,7 +52,7 @@ prop.test(x = 60, n = 100)
 * la tendance centrale (deux réponses vu la veille)
 * la dispersion (deux réponses vu la veille)
 
-```{r}
+```{r stat robustes}
 head(rivers) # dataset contenant les longueurs des fleuves majeurs des USA
 boxplot(rivers)
 

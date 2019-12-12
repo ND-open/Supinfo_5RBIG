@@ -368,29 +368,63 @@ summary {
 
 
 <p>Prérequis : enregistrez votre version <code>Rmd</code> d’Activité rapide (type <code>mon_ar4.Rmd</code>)</p>
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## -- Attaching packages -------------- tidyverse 1.2.1 --</code></pre>
-<pre><code>## v ggplot2 3.2.0     v purrr   0.3.2
-## v tibble  2.1.3     v dplyr   0.8.3
-## v tidyr   1.0.0     v stringr 1.4.0
-## v readr   1.3.1     v forcats 0.4.0</code></pre>
-<pre><code>## -- Conflicts ----------------- tidyverse_conflicts() --
-## x dplyr::filter() masks stats::filter()
-## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>suppressPackageStartupMessages( library(tidyverse) )</code></pre>
 <ol style="list-style-type: decimal">
-<li><p>Créez le vecteur d’entiers x = {1, 2, …, 10}</p></li>
-<li><p>Simuler 10 nombres issus d’une Loi Normale centrée (moyenne nulle) et réduite (variance de 1) (option par défault)</p></li>
+<li>Créez le vecteur d’entiers x = {1, 2, …, 10}</li>
 </ol>
-<pre class="r"><code>set.seed(123)</code></pre>
+<pre class="r"><code>1:10</code></pre>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
+<pre class="r"><code>c(1:10)</code></pre>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
+<pre class="r"><code>c(1,2,3,4,5,6,7,8,9,10)</code></pre>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
+<pre class="r"><code>seq(1, 10, length.out = 10) # by = 2</code></pre>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>Simuler 10 nombres issus d’une Loi Normale centrée (moyenne nulle) et réduite (variance de 1) (option par défault)</li>
+</ol>
+<pre class="r"><code>set.seed(123)
+rnorm(n = 10, mean = 0, sd = 1)</code></pre>
+<pre><code>##  [1] -0.56047565 -0.23017749  1.55870831  0.07050839  0.12928774
+##  [6]  1.71506499  0.46091621 -1.26506123 -0.68685285 -0.44566197</code></pre>
+<pre class="r"><code># runif(10, 0, 1)
+# sample(x = 1:10, size = 10, replace = TRUE)</code></pre>
 <ol start="3" style="list-style-type: decimal">
-<li>Soit un x la réponse à 2), effectuer un test statistique de l’hypothèse &quot;la moyenne de l’échantillon x est nulle et concluez.</li>
+<li>Soit un x la réponse à 2), effectuez un test statistique de l’hypothèse &quot;la moyenne de l’échantillon x est nulle et concluez.</li>
 </ol>
 <pre class="r"><code>x &lt;- c(-0.560475646552213, -0.23017748948328, 1.55870831414912, 0.070508391424576, 
 0.129287735160946, 1.71506498688328, 0.460916205989202, -1.26506123460653, 
--0.686852851893526, -0.445661970099958)</code></pre>
+-0.686852851893526, -0.445661970099958)
+
+t.test(x)</code></pre>
+<pre><code>## 
+##  One Sample t-test
+## 
+## data:  x
+## t = 0.24742, df = 9, p-value = 0.8101
+## alternative hypothesis: true mean is not equal to 0
+## 95 percent confidence interval:
+##  -0.6076704  0.7569217
+## sample estimates:
+##  mean of x 
+## 0.07462564</code></pre>
 <ol start="4" style="list-style-type: decimal">
-<li><p>Supposons qu’une équipe E est remportée 60 matchs sur 100. Vérifiez par test statistique l’hypothèse “E remporte ses matchs avec un probabilité de 50%”</p></li>
-<li><p>Soit un jeu de données. Calculez des statistiques robustes (au seuil 10 %) pour :</p></li>
+<li>Supposons qu’une équipe E est remportée 60 matchs sur 100. Vérifiez par test statistique l’hypothèse “E remporte ses matchs avec un probabilité de 50%”</li>
+</ol>
+<pre class="r"><code>prop.test(x = 60, n = 100)</code></pre>
+<pre><code>## 
+##  1-sample proportions test with continuity correction
+## 
+## data:  60 out of 100, null probability 0.5
+## X-squared = 3.61, df = 1, p-value = 0.05743
+## alternative hypothesis: true p is not equal to 0.5
+## 95 percent confidence interval:
+##  0.4970036 0.6952199
+## sample estimates:
+##   p 
+## 0.6</code></pre>
+<ol start="5" style="list-style-type: decimal">
+<li>Soit un jeu de données. Calculez des statistiques robustes (au seuil 10 %) pour :</li>
 </ol>
 <ul>
 <li>la tendance centrale (deux réponses vu la veille)</li>
@@ -398,6 +432,19 @@ summary {
 </ul>
 <pre class="r"><code>head(rivers) # dataset contenant les longueurs des fleuves majeurs des USA</code></pre>
 <pre><code>## [1] 735 320 325 392 524 450</code></pre>
+<pre class="r"><code>boxplot(rivers)</code></pre>
+<p><img src="data:image/png;base64,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CigwnNoC+urH1iibL56WPl1AgeHUFdA39/amgd1+VLYBAQWGU1VAz5ZNNO+uLn3W/HD0XdEWBBQYTk0B/fvrbTAfth54sQ3qrV9LNiGgwHBqCujzTi6bpH5VsgkBBYZTUUA33y8W+yfsZ4vFpyVX4wUUGE5FAd2+3eycr7/rsdav4ktogBEJKECoooBuT+GP9u9aKj+FBxjOkI27aNTQG7xy3Kll82fROyWbmHpnAzfLoI07HzOgr5fbgj5rPfBm28/Om1KAao34V8bnTfCPVj+tG79c3klfdBcTwKyNeZnm9+Xe2+ejb0f8fwP4yEa9zr05aSf06EEykQlgrsa+UWjzan2yWq0erJ+qJ3DDuNMSICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQElCAkIAChAQUICSgACEBBQgJKEBIQAFCAgoQ+j/XeEAjSzknUAAAAABJRU5ErkJggg==" width="672" /></p>
+<pre class="r"><code># --- tendance centrale
+median(rivers)</code></pre>
+<pre><code>## [1] 425</code></pre>
+<pre class="r"><code>mean(rivers, trim = 0.10)</code></pre>
+<pre><code>## [1] 490.9469</code></pre>
+<pre class="r"><code># --- variation / dispersion
+# sd(rivers) ---&gt; non robuste, affecté par les outliers
+IQR(rivers)</code></pre>
+<pre><code>## [1] 370</code></pre>
+<pre class="r"><code>mad(rivers)</code></pre>
+<pre><code>## [1] 214.977</code></pre>
 
 
 

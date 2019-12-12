@@ -24,16 +24,14 @@ functions "mutate" and "ifelse").
 values: "DEF" (for "RCB","CB","LCB","LB","RB","RWB","LWB"), "MID" (for "RCM","LCM","LDM","CAM","CDM","RM","LAM","LM","RDM","CM","RAM"), "FWD" (for "RF","ST","LW","LF","RS","LS","RW","CF") and "GK" (for "GK"). What is the interest of doing that?
 
 
-```{r}
+```{r load libraries}
 library(tidyverse)
 ```
 
 
-```{r}
+```{r load data}
 dfr <- readr::read_csv("../day2/FIFA.csv")
 dfr
-
-# as.numeric("93+2")
 ```
 
 Conversions :
@@ -50,21 +48,21 @@ Conversions :
 
 Comment effectuer des modifications dans DF, utiliser `mutate` ou `transmute`.
 
-```{r}
+```{r height clean}
 dfr_clean <- dfr %>%  
   separate(col = Height, into = c("foot", "inch")) %>% # glimpse
   mutate(Height = 30.48*as.numeric(foot) + 2.54*as.numeric(inch) )
 ```
 
 
-```{r}
+```{r weight clean}
 # dfr_clean$Weight %>% substr(x = ., start = 1, stop = length(Weight)-3) ### ! error
 dfr_clean <- dfr_clean %>%
   mutate(Weight = substr(x = Weight, start = 1, stop = nchar(Weight)-3)) # transmute
 ```
 
 
-```{r}
+```{r value and wage clean}
 # 1£ <-> 1.17 €
 # ratio_livre_eur <- 1.17
 
@@ -85,17 +83,17 @@ dfr_clean2 <- dfr_clean %>%
          ) ) %>% 
   mutate(  #) %>%  select(power) %>% unique
     power2 = substr(Wage, nchar(Wage), nchar(Wage)),
-    Wage2 = substr(Wage, 1, nchar(Wage)-1),
-    Wage2 = case_when(
-      power2 == "M" ~ as.numeric(Wage2)*1e6,
-      power2 == "K" ~ as.numeric(Wage2)*1e3,
-      power2 == "0" ~ as.numeric(Wage2)
+    Wage = substr(Wage, 1, nchar(Wage)-1),
+    Wage = case_when(
+      power2 == "M" ~ as.numeric(Wage)*1e6,
+      power2 == "K" ~ as.numeric(Wage)*1e3,
+      power2 == "0" ~ as.numeric(Wage)
     ) )
   # select(power2) %>% unique()
-names(dfr_clean2)
+# names(dfr_clean2)
 ```
 
-```{r}
+```{r factor work rate and body type clean}
 dfr_clean %>% 
   select(`Work Rate`) %>%  # %>% 
   # unique()
@@ -129,12 +127,23 @@ names(dfr_final)
 ### Outliers
 
 
+```{r outlier detection}
+dfr_final %>% 
+  select_if(is.numeric) %>% 
+  psych::describe()
+
+dfr_final %>% 
+  ggplot( aes(y = Wage)) +
+  geom_boxplot()
+```
+
+
 ### Stats aggregatting
 
 
 3) Add a variable General Position which summarize the variable Position in four values: "DEF" (for "RCB","CB","LCB","LB","RB","RWB","LWB"), "MID" (for "RCM","LCM","LDM","CAM","CDM","RM","LAM","LM","RDM","CM","RAM"), "FWD" (for "RF","ST","LW","LF","RS","LS","RW","CF") and "GK" (for "GK"). What is the interest of doing that?
 
-```{r}
+```{r stats variable summary}
 # def_vars <- c("RCB","CB","LCB","LB","RB","RWB","LWB")
 # mid_vars <- c("RCM","LCM","LDM","CAM","CDM","RM","LAM","LM","RDM","CM","RAM")
 # fwd_vars <- c("RF","ST","LW","LF","RS","LS","RW","CF")
@@ -154,53 +163,96 @@ names(dfr_final)
 
 ## 
 
-```{r}
-names(dfr_final)
+```{r select data for study}
+# dput( names(dfr_final) )
+
+# all_names <- c("X1", "ID", "Name", "Age", "Photo", "Nationality", "Flag", 
+# "Overall", "Potential", "Club", "Club Logo", "Value", "Wage", 
+# "Special", "Preferred Foot", "International Reputation", "Weak Foot", 
+# "Skill Moves", "Work Rate", "Body Type", "Real Face", "Position", 
+# "Jersey Number", "Joined", "Loaned From", "Contract Valid Until", 
+# "foot", "inch", "Weight", "LS", "ST", "RS", "LW", "LF", "CF", 
+# "RF", "RW", "LAM", "CAM", "RAM", "LM", "LCM", "CM", "RCM", "RM", 
+# "LWB", "LDM", "CDM", "RDM", "RWB", "LB", "LCB", "CB", "RCB", 
+# "RB", "Crossing", "Finishing", "HeadingAccuracy", "ShortPassing", 
+# "Volleys", "Dribbling", "Curve", "FKAccuracy", "LongPassing", 
+# "BallControl", "Acceleration", "SprintSpeed", "Agility", "Reactions", 
+# "Balance", "ShotPower", "Jumping", "Stamina", "Strength", "LongShots", 
+# "Aggression", "Interceptions", "Positioning", "Vision", "Penalties", 
+# "Composure", "Marking", "StandingTackle", "SlidingTackle", "GKDiving", 
+# "GKHandling", "GKKicking", "GKPositioning", "GKReflexes", "Release Clause", 
+# "Height", "currency", "power", "power2")
+
+all_names <- c("Name", "Age", "Nationality",
+"Overall", "Potential", "Club", "Value", "Wage",
+"Special", "Preferred Foot", "International Reputation", "Weak Foot",
+"Skill Moves", "Work Rate", "Body Type", "Real Face", "Position",
+"Jersey Number", "Joined", "Loaned From", "Contract Valid Until",
+"Height", "Weight", "Crossing", "Finishing", "HeadingAccuracy", "ShortPassing",
+"Volleys", "Dribbling", "Curve", "FKAccuracy", "LongPassing",
+"BallControl", "Acceleration", "SprintSpeed", "Agility", "Reactions",
+"Balance", "ShotPower", "Jumping", "Stamina", "Strength", "LongShots",
+"Aggression", "Interceptions", "Positioning", "Vision", "Penalties",
+"Composure", "Marking", "StandingTackle", "SlidingTackle", "GKDiving",
+"GKHandling", "GKKicking", "GKPositioning", "GKReflexes")
 
 df_study <- dfr_final %>% 
-  select_at(c(3:29, 91, 95) )
+  # select_at(c(3:29, 91, 95) )
+  select(all_names)
+
+df_study %>% 
+  glimpse()
+
+# --- save file to all work on the same
+# saveRDS(object = df_study, file = "df_study.rds")
 ```
 
 
 
 1) Study the main quantitative variables: descriptives statistics, charts, confidence intervals, relevant statistical tests, etc.
 
-```{r}
-df_study %>% 
-  # glimpse()
-  # select(`International Reputation`) %>%
+```{r load rds file}
+# library(tidyverse)
+df_study <- readRDS("df_study.rds")
+```
+
+
+```{r desc stats}
+df_study %>%
   select_if(is.numeric) %>% 
   psych::describe()
 
-summary(df_study)
+# summary(df_study)
+```
+
+Study of Wage 
+
+```{r wage study}
+df_study %>%
+  select(Wage) 
 ```
 
 
 2) Who are the top 100 players according to the variable "Overall"? Which are their clubs and nationalities? What is the proportion of their wage compare to the total wage of all players?
 
-```{r}
+```{r overall study}
 df_study %>% 
-  group_by(Overall) %>% 
-  top_n(100)
-
-df_study %>% 
-  arrange(-Overall)
-
+  # group_by(Overall) %>% 
+  top_n(x = ., n = 100, wt = Overall)
 
 # df_study %>% 
-# order(df_study[["Overall"]])
+#   arrange(-Overall)
 
 # df_study[ order(-df_study$Overall) , ]
-
 ```
 
 ```{r}
-df_study %>% 
-  group_by(Overall) %>% 
-  top_n(100) %>% 
-  # slice(1:100) %>% 
-  # geoup_by()
-  mutate(wage_prop = sum(Wage2))
+# df_study %>% 
+#   group_by(Overall) %>% 
+#   top_n(100) %>% 
+#   # slice(1:100) %>% 
+#   # geoup_by()
+#   mutate(wage_prop = sum(Wage2))
 
 sum(df_study[1:100,]$Wage2, na.rm = TRUE)/sum(df_study$Wage2, na.rm = TRUE)
 100/nrow(df_study)
@@ -212,9 +264,7 @@ sum(df_study[1:100,]$Wage2, na.rm = TRUE)/sum(df_study$Wage2, na.rm = TRUE)
 
 ```{r}
 df_study %>% 
-  select(Wage2, Potential)
-
-
+  select(Wage, Potential)
 ```
 
 
@@ -238,3 +288,5 @@ df_study %>%
 10) Use the library "wordcloud2" to represent the players' nationalities with a word-cloud chart.
 
 11) Use the library "fmsb" to represent the main characteristics of top players with a radar chart. Which are the limits of this kind of chart?
+
+### Day3
