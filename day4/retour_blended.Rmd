@@ -1,0 +1,93 @@
+---
+title: "Logistic Regression in R and Excel"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+
+## 0 - More on R stats
+
+1) Anova
+
+```{r}
+iris
+```
+
+
+2) cluster analysis
+
+```{r}
+data(mtcars)
+```
+
+3) PCA
+
+```{r}
+
+```
+
+
+## 1 - Ordinary Regression and Nominal Outcome Variables
+## 2 - Solutions to Problems with Ordinary Regression
+
+Odds vs Probability
+
+* Suppose a team as a 6/10 probability to win a match, what are its odds of winning ?
+
+* Suppose a team as a 3:1 odds to win a match, what is its probability of winning ?
+
+* Give a formula to find the odd (to win vs 1) given a probability
+
+* Give a formula to find the probability (to win vs 1) given an odd (of winning vs 1) 
+
+## 3 - Running a Logistic Regression in Excel
+
+cf excel files
+
+## 4 - Running a Binomial Logistic Regression in R
+
+```{r}
+iris2 <- iris
+iris2$Species <- ifelse(iris$Species == "setosa", 1, 0)
+g_mod <- glm(formula = Species ~ 0 + . , family = "binomial", data = iris2)
+summary(g_mod)
+```
+
+With `mlogit` package :
+
+```{r}
+iris3 <- mlogit.data(iris, choice = "Species", shape = "wide")
+iris3
+uni_mod <- mlogit(Species ~ 1 | 0 + Sepal.Length + Sepal.Width, data = iris3)
+
+```
+
+```{r}
+uni_mod
+summary(uni_mod)
+```
+
+
+## 5 - Running a Multinomial Logistic Regression in R
+
+```{r}
+library(mlogit)
+data(Fishing, package = "mlogit")
+Fishing
+Fishing_long <- mlogit.data(Fishing, varying = c(2:9), shape = "wide", choice = "mode")
+
+multi_mod <- mlogit(mode ~ 0 + price + catch | 0 + income, data = Fishing_long)
+```
+
+```{r}
+multi_mod
+summary(multi_mod)
+```
+

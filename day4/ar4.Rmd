@@ -16,13 +16,20 @@ library(tidyverse)
 1) Créez le vecteur d'entiers x = {1, 2, ..., 10} 
 
 ```{r}
+1:10
+c(1:10)
+c(1,2,3,4,5,6,7,8,9,10)
 
+seq(1, 10, length.out = 10) # by = 2
 ```
 
 2) Simuler 10 nombres issus d'une Loi Normale centrée (moyenne nulle) et réduite (variance de 1) (option par défault)
 
 ```{r}
 set.seed(123)
+rnorm(n = 10, mean = 0, sd = 1)
+# runif(10, 0, 1)
+# sample(x = 1:10, size = 10, replace = TRUE)
 ```
 
 3) Soit un x la réponse à 2), effectuer un test statistique de l'hypothèse "la moyenne de l'échantillon x est nulle et concluez.
@@ -31,12 +38,14 @@ set.seed(123)
 x <- c(-0.560475646552213, -0.23017748948328, 1.55870831414912, 0.070508391424576, 
 0.129287735160946, 1.71506498688328, 0.460916205989202, -1.26506123460653, 
 -0.686852851893526, -0.445661970099958)
+
+t.test(x)
 ```
 
 4) Supposons qu'une équipe E est remportée 60 matchs sur 100. Vérifiez par test statistique l'hypothèse "E remporte ses matchs avec un probabilité de 50%"
 
 ```{r}
-
+prop.test(x = 60, n = 100)
 ```
 
 5) Soit un jeu de données. Calculez des statistiques robustes (au seuil 10 %) pour :
@@ -45,6 +54,16 @@ x <- c(-0.560475646552213, -0.23017748948328, 1.55870831414912, 0.07050839142457
 
 ```{r}
 head(rivers) # dataset contenant les longueurs des fleuves majeurs des USA
+boxplot(rivers)
+
+# --- tendance centrale
+median(rivers)
+mean(rivers, trim = 0.10)
+
+# --- variation / dispersion
+# sd(rivers) ---> non robuste, affecté par les outliers
+IQR(rivers)
+mad(rivers)
 ```
 
 

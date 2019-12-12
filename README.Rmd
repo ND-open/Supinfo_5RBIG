@@ -37,3 +37,35 @@ Plusieurs options sont possibles :
   
   + `retour_blended`
   
+### Jour 2
+
+* Préparation du Quizz
+
+  + `ar2` (activité rapide 1, utiliser le `.html` pour le lire et le `.Rmd` pour voir le script du rapport R markdown) contient les informations relatives aux exercices de début de cours
+  
+  + `retour_blended`
+  
+  + `tp2_edgar`
+  
+  + `tp2_fifa`
+  
+### Jour 3
+
+* Préparation du Quizz
+
+  + `ar3` (activité rapide 1, utiliser le `.html` pour le lire et le `.Rmd` pour voir le script du rapport R markdown) contient les informations relatives aux exercices de début de cours
+  
+  + `retour_blended`
+  
+  + `tp3_fifa`
+  
+### Jour 4
+
+* Préparation du Quizz
+
+  + `ar4` (activité rapide 1, utiliser le `.html` pour le lire et le `.Rmd` pour voir le script du rapport R markdown) contient les informations relatives aux exercices de début de cours
+  
+  + `retour_blended`
+  
+  + `tp4_fifa`
+  
