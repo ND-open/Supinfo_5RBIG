@@ -31,7 +31,7 @@ library(tidyverse)
 
 ```{r load data}
 dfr <- readr::read_csv("../day2/FIFA.csv")
-dfr
+dfr # %>% names
 ```
 
 Conversions :
@@ -58,7 +58,7 @@ dfr_clean <- dfr %>%
 ```{r weight clean}
 # dfr_clean$Weight %>% substr(x = ., start = 1, stop = length(Weight)-3) ### ! error
 dfr_clean <- dfr_clean %>%
-  mutate(Weight = substr(x = Weight, start = 1, stop = nchar(Weight)-3)) # transmute
+  mutate(Weight = as.numeric( substr(x = Weight, start = 1, stop = nchar(Weight)-3)) ) # transmute
 ```
 
 
@@ -89,7 +89,7 @@ dfr_clean2 <- dfr_clean %>%
       power2 == "K" ~ as.numeric(Wage)*1e3,
       power2 == "0" ~ as.numeric(Wage)
     ) )
-  # select(power2) %>% unique()
+# select(power2) %>% unique()
 # names(dfr_clean2)
 ```
 
@@ -107,8 +107,8 @@ dfr_clean %>%
   group_by(`Body Type`) %>% 
   summarise(nb = n()) %>% 
   arrange(-nb)
-  # ggplot( aes(x = `Body Type`, y = nb)) +
-  # geom_col()
+# ggplot( aes(x = `Body Type`, y = nb)) +
+# geom_col()
 
 dfr_final <- dfr_clean2 %>% 
   mutate_if(.predicate = is.character, .funs = factor) %>% 
@@ -145,6 +145,8 @@ dfr_final %>%
 3) Add a variable General Position which summarize the variable Position in four values: "DEF" (for "RCB","CB","LCB","LB","RB","RWB","LWB"), "MID" (for "RCM","LCM","LDM","CAM","CDM","RM","LAM","LM","RDM","CM","RAM"), "FWD" (for "RF","ST","LW","LF","RS","LS","RW","CF") and "GK" (for "GK"). What is the interest of doing that?
 
 ```{r stats variable summary}
+# View(dfr_final)
+
 # def_vars <- c("RCB","CB","LCB","LB","RB","RWB","LWB")
 # mid_vars <- c("RCM","LCM","LDM","CAM","CDM","RM","LAM","LM","RDM","CM","RAM")
 # fwd_vars <- c("RF","ST","LW","LF","RS","LS","RW","CF")
@@ -185,17 +187,17 @@ dfr_final %>%
 # "Height", "currency", "power", "power2")
 
 all_names <- c("Name", "Age", "Nationality",
-"Overall", "Potential", "Club", "Value", "Wage",
-"Special", "Preferred Foot", "International Reputation", "Weak Foot",
-"Skill Moves", "Work Rate", "Body Type", "Real Face", "Position",
-"Jersey Number", "Joined", "Loaned From", "Contract Valid Until",
-"Height", "Weight", "Crossing", "Finishing", "HeadingAccuracy", "ShortPassing",
-"Volleys", "Dribbling", "Curve", "FKAccuracy", "LongPassing",
-"BallControl", "Acceleration", "SprintSpeed", "Agility", "Reactions",
-"Balance", "ShotPower", "Jumping", "Stamina", "Strength", "LongShots",
-"Aggression", "Interceptions", "Positioning", "Vision", "Penalties",
-"Composure", "Marking", "StandingTackle", "SlidingTackle", "GKDiving",
-"GKHandling", "GKKicking", "GKPositioning", "GKReflexes")
+               "Overall", "Potential", "Club", "Value", "Wage",
+               "Special", "Preferred Foot", "International Reputation", "Weak Foot",
+               "Skill Moves", "Work Rate", "Body Type", "Real Face", "Position",
+               "Jersey Number", "Joined", "Loaned From", "Contract Valid Until",
+               "Height", "Weight", "Crossing", "Finishing", "HeadingAccuracy", "ShortPassing",
+               "Volleys", "Dribbling", "Curve", "FKAccuracy", "LongPassing",
+               "BallControl", "Acceleration", "SprintSpeed", "Agility", "Reactions",
+               "Balance", "ShotPower", "Jumping", "Stamina", "Strength", "LongShots",
+               "Aggression", "Interceptions", "Positioning", "Vision", "Penalties",
+               "Composure", "Marking", "StandingTackle", "SlidingTackle", "GKDiving",
+               "GKHandling", "GKKicking", "GKPositioning", "GKReflexes")
 
 df_study <- dfr_final %>% 
   # select_at(c(3:29, 91, 95) )
@@ -244,7 +246,7 @@ df_study %>%
   filter(Wage < 6000) %>% # unique
   ggplot( aes(x = Wage)) +
   geom_histogram(bins = 100)
-  
+
 df_study %>%
   select(Wage) %>% 
   filter(Wage > 6000 ) %>%
@@ -284,7 +286,7 @@ df_study %>%
 # df_study[ order(-df_study$Overall) , ]
 ```
 
-```{r}
+```{r wage repartition}
 # df_study %>% 
 #   group_by(Overall) %>% 
 #   top_n(100) %>% 
@@ -292,7 +294,7 @@ df_study %>%
 #   # geoup_by()
 #   mutate(wage_prop = sum(Wage2))
 
-sum(df_study[1:100,]$Wage2, na.rm = TRUE)/sum(df_study$Wage2, na.rm = TRUE)
+sum(df_study[1:100,]$Wage, na.rm = TRUE)/sum(df_study$Wage, na.rm = TRUE)
 100/nrow(df_study)
 ```
 
@@ -300,31 +302,419 @@ sum(df_study[1:100,]$Wage2, na.rm = TRUE)/sum(df_study$Wage2, na.rm = TRUE)
 
 2.2) Study the age dependance of main quantitative variables.
 
-```{r}
+```{r Potential vs age study}
 df_study %>% 
   select(Wage, Potential)
+
+df_study %>% 
+  ggplot( aes(Potential, Wage)) +
+  geom_point()
+# geom_smooth(method = "loess")
+
+df_study %>% 
+  ggplot( aes(Age, Potential)) +
+  geom_point()
+
+# chisq.test(df_study$Potential, df_study$Potential)
 ```
 
 
 3) Study the different categorical variables: frequencies, proportions, charts.
 
-4) Does the preferred food have an impact on the other variables? Is the proportion of left-handed footballers conform to all humans?
+```{r Nationality study}
+# df_study %>% 
+#   select_if(is.factor)
+
+# head(as.numeric(df_study$Weight) ) # correcton ok dans script
+
+# df_study %>% 
+#   group_by(Nationality) %>% 
+#   summarise(nb = n()) %>% 
+#   arrange(-nb)
+
+df_study %>% 
+  group_by(Nationality) %>% 
+  summarise(nb = n()) %>% 
+  arrange(-nb) %>% 
+  slice(1:10) %>% 
+  ggplot( aes(x = fct_reorder(Nationality, nb), y = nb)) + # 
+  geom_col() +
+  coord_flip() +
+  geom_text(aes(x = fct_reorder(Nationality, nb), y = nb + 50, label = nb) )
+```
+
+
+4) Does the preferred foot have an impact on the other variables? Is the proportion of left-handed footballers conform to all humans?
+
+```{r left vs right footer}
+df_study %>% 
+  select(`Preferred Foot`) %>% # unique
+  group_by(`Preferred Foot`) %>% 
+  summarise(nb = n())
+
+prop.table( table(df_study$`Preferred Foot`) ) # 90% right handed says wiki
+
+# pf_mod <- lm(`Preferred Foot` ~ Wage + Overall, data = df_study) 
+
+df_study %>% 
+  select(`Preferred Foot`, Wage, Overall) %>% # unique
+  group_by(`Preferred Foot`) %>% 
+  summarise_all(.funs = ~mean(., na.rm = TRUE))
+
+# possible également avec aggregate
+
+```
+
 
 5) Study the influence of the variable "Position" on the variables "Value" and "Overall". 
 
+```{r is position important ?}
+mod <- lm(Value ~ Overall + Position, data = df_study)
+summary(mod)
+anova(mod)
+
+mod <- lm(Overall ~ Position, data = df_study)
+anova(mod)
+```
+
+
 6) Same thing with the variable "General Position".
+
+cf before
+
 
 7) Study and represent the dependencies between the main categorical variables.
 
-8) Study the association between the variables "Value" and "Overall". Is a linear regression relevant? Perform an exponential regression.
+You can use a chi-squared test to test the null hypothesis ($H_0$) "the variables prefered foot and nationality are dependent"
+
+```{r categorical dependencies}
+# df_study %>% 
+#   select_if(is.factor)
+
+# Nationnality vs foot
+# df_study %>% 
+#   group_by(Nationality, `Preferred Foot`) %>% 
+#   summarise(nb = n()) %>% 
+#   arrange(-nb)
+
+chisq.test(x = df_study$Nationality, df_study$`Preferred Foot`)
+
+# df_study %>% 
+#   group_by(Nationality, `Preferred Foot`) %>%
+#   summarise(nb = n()) %>%
+#   arrange(-nb) %>% 
+#   slice(1:10) %>% 
+#   ggplot( aes( x = `Preferred Foot`, y = nb, colour = Nationality)) +
+#   geom_col()
+
+```
+
+Using the p-value we reject the hypothesis "there is a strong dependency of the prefered foot and the nationality".
+
+8) Study the association between the variables "Value" and "Overall". Is a linear regression relevant ? Perform an exponential regression.
+
+Firstly, an inspection of the data with a scatter plot shows that a linear regression is not suited. We can instead look at the graph of the Overall values against the log(Value) variable.
+
+```{r scatterplot of Overall against Value}
+df_study %>% 
+  ggplot(aes(Value, Overall)) + 
+  geom_point(alpha = .5) +
+  ggtitle("Scatterplot of the variables Overall depending on Value") +
+  theme_minimal()
+```
+
+Since the scale of the `Value` variable grows exponentially we use a log transformation on that variable.
+
+```{r log(Overall) vs Value}
+df_study %>%
+  ggplot(aes(log(Value), Overall ) ) +
+  # ggplot(aes(log(Value), log(Overall) ) ) + 
+  geom_point(alpha = .5) +
+  ggtitle("Scatterplot of the variables Overall depending on the log Value") +
+  theme_minimal()
+```
+
+Then, since the log is the inverse transformation of the exponential function we perform the wanted "exponential regression".
+
+```{r lm and graph}
+fit <- lm(Overall ~ log(Value), data = df_study)
+summary(fit)
+```
+
+Finally we obtain a good model ($R^2 = 0.88$) of the form :
+
+$$Overall \approx 3.3 + 4.6 \times log(Value)$$
 
 9) Study and represent the variable "Value" in function of the variable "Club" (we will limit ourselves to the 15 main clubs according to global overall). Same thing for the variables "Overall" and "Potential". Interpret. Compare your favorite clubs.
+
+The goal is to study a quantitative variable (Value) against a qualitative one (Club). Several visualisation are possible in this case :
+
+* setting Club as a factor and colour variable :
+
++ Dot plot
+
+```{r dotplot}
+# get 15 main clubs
+clubs <- df_study %>% na.omit() %>% 
+  group_by(Club) %>% 
+  summarise(nb = n(), mean_all = mean(Overall), mean_value = mean(Value)) %>%  
+  arrange(-mean_all) %>% 
+  top_n(n = 15, wt = mean_all)
+
+df_clubs <- df_study %>% na.omit() %>% 
+  filter(Club %in% clubs$Club) %>%
+  select(Club, Value)
+
+df_clubs %>% ggplot(aes(x = Value, y = Club, colour = Club)) +
+  geom_point(alpha = .7, show.legend = FALSE) +
+  ggtitle("Dotplot of the value of the players per clubs") +
+  theme_minimal()
+```
+
+
+```{r boxplot}
+df_clubs %>% ggplot(aes(x = Club, y = Value, fill = Club)) +
+  geom_boxplot(notch = FALSE, show.legend = FALSE) +
+  geom_point(inherit.aes = FALSE, data = aggregate(x = df_clubs$Value, list(df_clubs$Club), mean), aes(x = Group.1, y = x), colour = "red", show.legend = FALSE) +
+  coord_flip() +
+  ggtitle("Boxplot of the value of the players per clubs with mean in red") +
+  theme_minimal()
+```
+
+
++ Nor density and histogram plot should be used here (there are too many clubs to display to get a readable graph)
+
+```{r density and histogram}
+# --- not readable
+# df_clubs %>% ggplot(aes(x = Value, fill = Club)) +
+#   geom_histogram(alpha = .5, colour = "black") +
+#   ggtitle("Histogram of the value of the players per clubs") +
+#   theme_minimal()
+
+# df_clubs %>% ggplot(aes(x = Value, fill = Club)) +
+#   geom_density(alpha = .5, colour = "black") +
+#   ggtitle("(Kernel) Density of the value of the players per clubs") +
+#   theme_minimal()
+```
+
+
+* create a graph per club in a facet plot :
+
+```{r histogram}
+df_clubs %>% ggplot(aes(x = Value, fill = Club)) +
+  geom_histogram(alpha = .5, colour = "black", show.legend = FALSE) +
+  facet_wrap("Club") +
+  ggtitle("Histogram of the value of the players per clubs") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+
+```{r density}
+df_clubs %>% ggplot(aes(x = Value, fill = Club)) +
+  geom_density(alpha = .7, colour = "black", show.legend = FALSE) +
+  facet_wrap("Club") +
+  ggtitle("(Kernel) Density of the value of the players per clubs") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
 
 
 ### ---
 
 10) Use the library "wordcloud2" to represent the players' nationalities with a word-cloud chart.
 
+Wordclouds are much appreciated in marketing, but it is a biased representation since :
+
+* longer word can be more seen (here "Republic of Ireland" wrongly appears bigger than "Sweden") 
+* area is not well percieved by the human eye (same argument as why you can lie with sector graphs)
+
+```{r wordcloud2}
+if(!require(wordcloud2)){install.packages("wordcloud2")}
+
+# --- example from the help
+library(wordcloud2)
+wordcloud2(demoFreq)
+detach("package:wordcloud2")
+# --- application to our case
+wordcloud2::wordcloud2(data = table(df_study$Nationality) )
+```
+
+
 11) Use the library "fmsb" to represent the main characteristics of top players with a radar chart. Which are the limits of this kind of chart?
 
-### Day3
+
+```{r}
+if(!require("fmsb")){install.packages("fmsb")}
+
+# # --- example from the help ---
+
+# col2use <- RColorBrewer::brewer.pal(8, "Dark2")[1:3]
+# 
+# fmsb::radarchart(
+#   rbind(maxmin =
+#           data.frame(total=c(5, 1),
+#                      phys=c(15, 3),
+#                      psycho=c(3, 0),
+#                      social=c(5, 1),
+#                      env=c(5, 1)
+#           ),
+#         data.frame(total=runif(3, 1, 5),
+#                    phys=rnorm(3, 10, 2),
+#                    psycho=c(0.5, NA, 3),
+#                    social=runif(3, 1, 5),
+#                    env=c(5, 2.5, 4)
+#                    )
+#   ),
+#   # pfcol = 1:3
+#   axistype=1 ,
+#   #custom polygon
+#   # pcol=rgb(0.2,0.5,0.5,0.9) , pfcol=rgb(0.2,0.5,0.5,0.5) , plwd=4 ,
+#   pcol= col2use, pfcol=col2use , plwd=4 ,
+#   #custom the grid
+#   cglcol="grey", cglty=1, axislabcol="grey", caxislabels=seq(0,20,5), cglwd=0.8,
+#   #custom labels
+#   vlcex=0.8
+# )
+
+
+# --- application to our case
+# RColorBrewer::display.brewer.all()
+# RColorBrewer::brewer.pal(8, "Dark2")
+
+```
+
+
+
+## --- Day3 ---
+
+1) Finish if necessary the previous session.
+
+
+2) Compute a correlation matrix for the quantitative variables "Age", "Overall", "Weight", "Height" and the players' main characteristic variables. Interpret. Draw a heat map for this correlation matrix.
+
+```{r correlation}
+# df_study$Weight <- as.numeric(df_study$Weight)
+df_study %>%
+  select(Age, Overall, Weight, Height)
+
+# str(df_study)
+cor(df_study[c("Age", "Overall", "Weight", "Height")], use = "complete.obs")
+
+df_na_omit <- na.omit(df_study[c("Age", "Overall", "Weight", "Height")]  )
+cor(df_na_omit)
+
+df_na_omit %>% 
+  cor(x = .)
+```
+
+
+We can represent correlation with the `corrplot` package as follow :
+
+```{r correlation plot}
+# df_study$Weight <- as.numeric(df_study$Weight)
+
+df_cor <- df_study %>%
+  select(Age, Overall, Weight, Height) %>% 
+  cor(. , use = "complete.obs")
+# df_cor
+
+# sum(is.na(df_study$Height))
+
+corrplot::corrplot(df_cor, type = "upper", diag = FALSE, method = "number")
+```
+
+
+3) Perform a multiple regression between the variable "Overall" and players' main characteristic variables.
+
+```{r regression multiple}
+df_study %>% # names
+  glimpse()
+
+df_perf <- df_study %>%
+  select_at(c(4, 24:57) )
+
+mod <- lm(Overall ~ 0 + ., data = df_perf)
+mod
+summary(mod)
+```
+
+
+4) Perform a k-means clustering algorithm for the top 100 players. Use for that the player's main characteristic variables. 
+
+Determine the optimal number of clusters. Draw a chart corresponding to this clustering. Study the General Position of players in each cluster.
+
+```{r choose the number of clusters / centers}
+df_perf_nao <- na.omit(df_perf)
+df_perf_top <- df_perf_nao %>% 
+  arrange(-Overall) %>% 
+  slice(1:100)
+
+km <- kmeans(df_perf_top, centers = 2)
+print(km)
+
+kml <- c()
+for (k in 2:10){
+  kml[k] <- kmeans(df_perf_top, centers = k)$tot.withinss
+}
+
+plot(1:10, kml, type = "l")
+```
+
+With k = 4
+
+```{r kmeans with 4 centers}
+km <- kmeans(df_perf_top, centers = 4)
+
+df_perf_top %>% 
+  ggplot( aes(x = Overall, y = Crossing, colour = factor( km$cluster ) ) ) +
+  geom_point()
+```
+
+
+5) Same question with a hierarchical clustering algorithm.
+
+```{r hierarchecal clusters}
+
+```
+
+
+6) Perform a Principal Component Analysis with the player's main characteristic variables. Represent the previous clusters on a plane defined by the first two components. Represent the previous clusters on a space defined by the first three components.
+
+
+```{r PCA}
+mod_pca <- prcomp(x = df_perf_top)
+summary(mod_pca)
+
+library(factoextra)
+factoextra::fviz_eig(mod_pca)
+factoextra::fviz_pca_ind(mod_pca, col.ind = factor(km$cluster))
+factoextra::fviz_pca_var(mod_pca)
+factoextra::fviz_pca_biplot(mod_pca, col.ind = factor(km$cluster) )
+```
+
+
+7) Add a binary variable whose values will be 0 and 1, a 0 if the international reputation is lesser or equal to 3 and a 1 otherwise. Perform a logistic regression between this new variable and the variables "Age" and "Potential".
+
+* With the package `stats`
+
+```{r 1 variable logistic regression with glm}
+df_logit <- df_study %>% 
+  mutate(top_inter = ifelse(`International Reputation` > 3, 1, 0)) %>% 
+  select(top_inter, Age, Potential)
+df_logit
+
+g_mod <- stats::glm(formula = top_inter ~ 0 + . , family = "binomial", data = df_logit)
+summary(g_mod)
+```
+
+* With the package `mlogit`
+
+```{r logistic regression with mlogit}
+library(mlogit)
+df_l2 <- mlogit.data(df_logit, choice = "top_inter", shape = "wide")
+df_l2
+uni_mod2 <- mlogit(top_inter ~ 1 | 0 + Age + Potential, data = df_l2)
+uni_mod2
+```
+

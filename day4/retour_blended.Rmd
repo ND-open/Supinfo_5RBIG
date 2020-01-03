@@ -71,7 +71,7 @@ rect.hclust(c, k = 7, border = "red")
 
 2.2) k means
 
-```{r}
+```{r kmeans}
 iris_num <- iris[,1:4]
 groups <- kmeans(x = iris_num, centers = 3)
 
